@@ -1,5 +1,6 @@
 ## app.R ##
 library(shinydashboard)
+library(dashboardthemes)
 # library(magrittr)
 library(bupaR)
 library("edeaR")
@@ -10,26 +11,43 @@ library("processmonitR")
 library("petrinetR")
 source("./demo-data-preparation.R", local=TRUE)
 eventlog <- timeline
+
+customlogo <- shinyDashboardLogoDIY(
+
+  boldText = "showpad"
+  ,mainText = "WeLoveHackathons"
+  ,textSize = 16
+  ,badgeText = "v0.1"
+  ,badgeTextColor = "white"
+  ,badgeTextSize = 2
+  ,badgeBackColor = "#40E0D0"
+  ,badgeBorderRadius = 3
+
+)
 ui <- dashboardPage(
-  dashboardHeader(title = "Basic dashboard"),
+  dashboardHeader(title = customlogo, titleWidth="300"),
+
   ## Sidebar content
   dashboardSidebar(
     sidebarMenu(
       menuItem("Process map", tabName = "process", icon = icon("angle-double-right")),
-      #menuItem("Precedence", tabName = "precedence", icon = icon("bullseye")),
 
-      menuItem("Documents", tabName = "documents", icon = icon("dashboard")),
+      menuItem("Documents", tabName = "documents", icon = icon("copy")),
 
-      menuItem("Channels", tabName = "channels", icon = icon("th")),
+      menuItem("Channels", tabName = "channels", icon = icon("comments")),
       menuItem("Traces", tabName = "traces", icon = icon("braille")),
      # menuItem("Activity", tabName = "activity", icon = icon("th")),
-      menuItem("Rework", tabName = "rework", icon = icon("th")),
-      menuItem("Performance", tabName = "performance", icon = icon("th"))
+      menuItem("Rework", tabName = "rework", icon = icon("thumbs-down")),
+      menuItem("Performance", tabName = "performance", icon = icon("star-half-alt"))
 
     )
   ),
   ## Body content
   dashboardBody(
+    ### changing theme
+    shinyDashboardThemes(
+      theme = "poor_mans_flatly"
+    ),
     tabItems(
       # First tab content
       tabItem(tabName = "process",
