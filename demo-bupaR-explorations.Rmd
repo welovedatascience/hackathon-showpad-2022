@@ -109,12 +109,5 @@ timeline %>% resource_map()
 ```
 
 
-## dashboard: activity
 
-```{r}
-timeline %>%  activity_dashboard()
-timeline %>%  resource_dashboard()
-timeline %>%  rework_dashboard()
-timeline %>%  performance_dashboard()
-```
 
