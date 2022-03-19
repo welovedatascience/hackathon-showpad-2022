@@ -17,7 +17,7 @@ library(bupaR)
 ## data preparation for hackathon
 
 ```{r}
-source("demo-data-preparation.R", local = TRUE)
+source("./process-mining-dashboard/demo-data-preparation.R", local = TRUE)
 
 ```
 
@@ -96,8 +96,17 @@ timeline %>% resource_matrix() %>% plot
 
 ```{r}
 timeline %>% dotted_chart()
+
+
 ```
 
+## dotted chart
+
+```{r}
+timeline %>% resource_map()
+
+
+```
 
 
 ## dashboard: activity

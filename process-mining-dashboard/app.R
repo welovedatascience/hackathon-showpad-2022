@@ -2,7 +2,13 @@
 library(shinydashboard)
 # library(magrittr)
 library(bupaR)
-source("./../demo-data-preparation.R", local=TRUE)
+library("edeaR")
+library("eventdataR")
+library("processmapR")
+library("processmonitR")
+# install.packages("xesreadR")
+library("petrinetR")
+source("./demo-data-preparation.R", local=TRUE)
 eventlog <- timeline
 ui <- dashboardPage(
   dashboardHeader(title = "Basic dashboard"),
@@ -10,13 +16,13 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Process map", tabName = "process", icon = icon("angle-double-right")),
-      menuItem("Precedence", tabName = "precedence", icon = icon("bullseye")),
+      #menuItem("Precedence", tabName = "precedence", icon = icon("bullseye")),
 
-      menuItem("Documents", tabName = "activity", icon = icon("dashboard")),
+      menuItem("Documents", tabName = "documents", icon = icon("dashboard")),
 
-      menuItem("Channels", tabName = "resource", icon = icon("th")),
-      menuItem("Traces", tabName = "resource", icon = icon("braille")),
-      menuItem("Activity", tabName = "activity", icon = icon("th")),
+      menuItem("Channels", tabName = "channels", icon = icon("th")),
+      menuItem("Traces", tabName = "traces", icon = icon("braille")),
+     # menuItem("Activity", tabName = "activity", icon = icon("th")),
       menuItem("Rework", tabName = "rework", icon = icon("th")),
       menuItem("Performance", tabName = "performance", icon = icon("th"))
 
@@ -43,7 +49,7 @@ ui <- dashboardPage(
       # performance -----
       tabItem(tabName = "performance",
            fluidRow(
-                tabBox(title="Processing time",
+                tabBox(title="Processing time",selected="Activity",
                        tabPanel("Log", plotOutput("processing_time_log")),
                        tabPanel("Case", plotOutput("processing_time_case")),
                        tabPanel("Activity", plotOutput("processing_time_activity")),
@@ -51,13 +57,13 @@ ui <- dashboardPage(
                        , width="100)%")
               ),
           fluidRow(
-            tabBox(title="Throughput time",
+            tabBox(title="Throughput time",selected='Case',
               tabPanel("Log", plotOutput("throughput_time_log")),
               tabPanel("Case", plotOutput("throughput_time_case"))
               , width="100)%")
             ),
           fluidRow(
-            tabBox(title="Idle time",
+            tabBox(title="Idle time",selected ="Resource",
                    tabPanel("Log", plotOutput("idle_time_log")),
                    tabPanel("Case", plotOutput("idle_time_case")),
                    tabPanel("Resource",plotOutput("idle_time_resource"))
@@ -68,7 +74,20 @@ ui <- dashboardPage(
 
         )
       ,
+   # channels ----
+      tabItem(tabName = "channels",
+              fluidRow(
+                box(DiagrammeR::grVizOutput("channels_plot1"), width = "100%")
+              )
+              ,
+              fluidRow(
 
+                # box(
+                #   title = "Controls",
+                #   sliderInput("process_map_filter", "Filter trace frequency:", 1, 100, 100)
+                # )
+              )
+      ),
 
       # rework -----
       tabItem(tabName = "rework",
@@ -88,12 +107,27 @@ ui <- dashboardPage(
               fluidRow(
                 tabBox(title="Documents",
                        tabPanel("Frequency", plotOutput("activity_frequency")),
-                       tabPanel("Presence", plotOutput("activity_presence"))
+                     tabPanel("Precedence", plotOutput("precedence"))
                        , width="100)%")
               )
 
+      ),
 
-      )
+      # traces -----
+      tabItem(tabName = "traces",
+              fluidRow(
+                box(plotOutput("traces_plot"),width = "100%")
+              )
+              ,
+              fluidRow(
+
+                box(
+                  title = "Controls",
+                  sliderInput("traces_filter", "Filter traces coverage:", 1, 100, 50)
+                )
+              )
+    )
+
 
 
     #           tabPanel("Processing time",
@@ -118,6 +152,10 @@ server <- function(input, output) {
     sub %>% process_map()
   })
 
+
+  output$channels_plot1 <- DiagrammeR::renderGrViz({
+    timeline %>% resource_map()
+  })
 
   output$throughput_time_log <- renderPlot({
     eventlog %>% throughput_time("log", units = input$units) %>%
@@ -171,6 +209,13 @@ server <- function(input, output) {
     eventlog %>% activity_presence() %>% plot()
   })
 
+  output$precedence <- renderPlot({
+    timeline %>% precedence_matrix() %>% plot
+  })
+
+  output$traces_plot <- renderPlot(
+    timeline %>% trace_explorer(coverage=input$traces_filter/100)
+  )
 }
 
 shinyApp(ui, server)
