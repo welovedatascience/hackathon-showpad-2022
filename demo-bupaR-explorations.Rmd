@@ -1,0 +1,111 @@
+---
+title: "showpad - process mining - example"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## set-up
+
+```{r}
+# install.packages("bupaR")
+library(bupaR)
+```
+
+## data preparation for hackathon
+
+```{r}
+source("demo-data-preparation.R", local = TRUE)
+
+```
+
+
+# Time perspective
+
+## idle time per channel
+
+```{r}
+timeline %>% idle_time("resource", units="days")
+
+timeline %>% idle_time("resource", units="days") %>%  plot()
+
+```
+## time spent on documents
+
+```{r}
+timeline %>% 
+    processing_time("activity") %>%
+    plot
+```
+## channels
+```{r}
+timeline %>%
+    resource_involvement(level = "resource") %>% plot
+```
+
+
+## documents
+
+```{r}
+timeline %>% activity_presence() %>% plot()
+```
+## process map
+
+```{r}
+timeline %>%
+    process_map()
+```
+
+
+
+```{r}
+timeline  %>%
+    process_map(type = frequency("relative"))
+```
+```{r}
+
+sub <- timeline %>% filter_trace_frequency(percentage=0.6)
+sub  %>%
+    process_map()
+```
+
+```{r}
+timeline %>%
+    process_map(performance(median, "days"))
+```
+
+
+## Frequent traces
+
+```{r}
+timeline %>% trace_explorer(coverage=0.5)
+```
+## documents/events precedence matrix 
+
+```{r}
+timeline %>% precedence_matrix() %>% plot
+```
+## channel matrix
+```{r}
+timeline %>% resource_matrix() %>% plot
+```
+
+## dotted chart
+
+```{r}
+timeline %>% dotted_chart()
+```
+
+
+
+## dashboard: activity
+
+```{r}
+timeline %>%  activity_dashboard()
+timeline %>%  resource_dashboard()
+timeline %>%  rework_dashboard()
+timeline %>%  performance_dashboard()
+```
+
