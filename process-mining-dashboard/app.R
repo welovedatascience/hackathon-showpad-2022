@@ -24,7 +24,7 @@ customlogo <- shinyDashboardLogoDIY(
   ,badgeBorderRadius = 3
 
 )
-ui <- dashboardPage(
+ui <- dashboardPage(title="WeLoveHackathons",
   dashboardHeader(title = customlogo, titleWidth="300"),
 
   ## Sidebar content
